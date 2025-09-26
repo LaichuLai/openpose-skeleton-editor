@@ -202,17 +202,32 @@ const PoseEditor = ({ canvasSize, showFace, showHands, onPoseChange }) => {
     }
   }, [])
 
+  // 重置姿勢
+  const resetPose = useCallback(() => {
+    setKeypoints(BODY_25_KEYPOINTS)
+    setFaceKeypoints(FACE_KEYPOINTS)
+    setDraggedPoint(null)
+    setHoveredPoint(null)
+  }, [])
+
   // 監聽姿勢模板載入事件
   useEffect(() => {
     const handleLoadPoseTemplate = (event) => {
       loadPoseTemplate(event.detail.template)
     }
 
+    const handleResetPose = () => {
+      resetPose()
+    }
+
     window.addEventListener('loadPoseTemplate', handleLoadPoseTemplate)
+    window.addEventListener('resetPose', handleResetPose)
+    
     return () => {
       window.removeEventListener('loadPoseTemplate', handleLoadPoseTemplate)
+      window.removeEventListener('resetPose', handleResetPose)
     }
-  }, [loadPoseTemplate])
+  }, [loadPoseTemplate, resetPose])
 
   // 快捷鍵處理
   useEffect(() => {
@@ -239,7 +254,7 @@ const PoseEditor = ({ canvasSize, showFace, showHands, onPoseChange }) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [])
+  }, [resetPose])
 
   // 繪製骨架
   const drawSkeleton = useCallback(() => {
@@ -516,14 +531,6 @@ const PoseEditor = ({ canvasSize, showFace, showHands, onPoseChange }) => {
   useEffect(() => {
     drawSkeleton()
   }, [drawSkeleton])
-
-  // 重置姿勢
-  const resetPose = () => {
-    setKeypoints(BODY_25_KEYPOINTS)
-    setFaceKeypoints(FACE_KEYPOINTS)
-    setDraggedPoint(null)
-    setHoveredPoint(null)
-  }
 
   return (
     <div className="space-y-4">
